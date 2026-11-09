@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عالمنا الساحر | إلى أميرتي ❤️</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700;900&family=Reem+Kufi:wght@500;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        night: {
+                            900: '#0b0716',
+                            800: '#150d2a',
+                            700: '#231442',
+                            600: '#351c62',
+                        },
+                        velvet: {
+                            500: '#e11d48',
+                            600: '#be123c',
+                            700: '#9f1239',
+                        },
+                        gold: '#f59e0b',
+                        roseGold: '#f472b6',
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        amiri: ['Amiri', 'serif'],
+                        reem: ['Reem Kufi', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #0b0716;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        #galaxyCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glass-panel {
+            background: rgba(21, 13, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(244, 114, 182, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel-glow {
+            background: rgba(35, 20, 66, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(225, 29, 72, 0.3);
+            box-shadow: 0 0 25px rgba(225, 29, 72, 0.15);
+        }
+
+        .glow-text-rose {
+            text-shadow: 0 0 20px rgba(244, 114, 182, 0.6), 0 0 40px rgba(225, 29, 72, 0.3);
+        }
+        .glow-text-gold {
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+
+        .tilt-card {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            transform-style: preserve-3d;
+        }
+        .tilt-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(225, 29, 72, 0.25);
+        }
+
+        .envelope-wrapper {
+            perspective: 1000px;
+        }
+        .envelope {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            background: #9f1239;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+        @media (min-width: 640px) {
+            .envelope { width: 340px; height: 220px; }
+        }
+        .envelope:hover {
+            transform: scale(1.04);
+        }
+        .envelope-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 100px solid #be123c;
+            transform-origin: top;
+            transition: transform 0.6s ease 0.2s, z-index 0.2s ease 0.2s;
+            z-index: 3;
+        }
+        @media (min-width: 640px) {
+            .envelope-top {
+                border-left-width: 170px;
+                border-right-width: 170px;
+                border-top-width: 120px;
+            }
+        }
+        .envelope-pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid #881337;
+            border-right: 140px solid #881337;
+            border-bottom: 95px solid #9f1239;
+            border-radius: 0 0 12px 12px;
+            z-index: 2;
+        }
+        @media (min-width: 640px) {
+            .envelope-pocket {
+                border-left-width: 170px;
+                border-right-width: 170px;
+                border-bottom-width: 115px;
+            }
+        }
+        .envelope-letter {
+            position: absolute;
+            bottom: 10px;
+            left: 5%;
+            width: 90%;
+            height: 80%;
+            background: #fff0f3;
+            border-radius: 8px;
+            transition: transform 0.6s ease;
+            z-index: 1;
+            padding: 15px;
+            color: #881337;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        }
+        .envelope.open .envelope-top {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+        .envelope.open .envelope-letter {
+            transform: translateY(-80px);
+            z-index: 4;
+        }
+
+        .pulse-slow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.4)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 25px rgba(225, 29, 72, 0.8)); transform: scale(1.05); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0716;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #be123c;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-gray-100 antialiased selection:bg-roseGold selection:text-night-900">
+
+    <canvas id="galaxyCanvas"></canvas>
+
+    <main class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-16 space-y-20 sm:space-y-32">
+
+        <header class="text-center space-y-6 pt-6 sm:pt-10 flex flex-col items-center">
+            
+            <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-panel border-roseGold/30 text-roseGold text-xs sm:text-sm font-semibold tracking-wide animate-bounce">
+                <i class="fas fa-sparkles text-amber-400"></i>
+                <span>مساحة صنعت بكل حب خصيصاً لكِ</span>
+            </div>
+
+            <h1 class="font-reem text-4xl sm:text-6xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-200 via-roseGold to-rose-500 leading-tight glow-text-rose px-2">
+                إلى أميرتي وسر سعادتي ❤️
+            </h1>
+
+            <p class="max-w-2xl text-base sm:text-xl text-gray-300 font-light leading-relaxed font-tajawal px-4">
+                في هذا الكون المتسع، كنتِ أنتِ النجمة الوحيدة التي أضاءت لي كل مظلم. هذه الصفحات هي توثيق صغير لحبٍ كبير جداً يتجدد كل ثانية.
+            </p>
+
+            <div class="pt-6">
+                <a href="#counterSection" class="text-roseGold/60 hover:text-roseGold transition-colors duration-300">
+                    <i class="fas fa-chevron-down text-2xl animate-bounce"></i>
+                </a>
+            </div>
+        </header>
+
+        <section id="counterSection" class="glass-panel-glow rounded-3xl p-6 sm:p-10 text-center space-y-8 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="space-y-2">
+                <span class="text-xs text-roseGold font-mono tracking-widest uppercase">Love Clock</span>
+                <h2 class="font-cairo text-2xl sm:text-4xl font-bold text-white flex items-center justify-center gap-3">
+                    <i class="fas fa-hourglass-half text-roseGold text-xl sm:text-2xl animate-spin" style="animation-duration: 8s;"></i>
+                    عداد أوقاتنا الجصيلة
+                </h2>
+                <p class="text-gray-400 text-xs sm:text-sm">كل لحظة قضيناها سوياً هي كنز حقيقي في حياتي</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-4">
+                <div class="glass-panel p-4 sm:p-6 rounded-2xl border-roseGold/20 transform hover:scale-105 transition duration-300">
+                    <span id="cDays" class="block font-bold text-3xl sm:text-5xl text-roseGold font-mono">00</span>
+                    <span class="text-xs sm:text-sm text-gray-400 mt-2 block">يــوم</span>
+                </div>
+                <div class="glass-panel p-4 sm:p-6 rounded-2xl border-roseGold/20 transform hover:scale-105 transition duration-300">
+                    <span id="cHours" class="block font-bold text-3xl sm:text-5xl text-roseGold font-mono">00</span>
+                    <span class="text-xs sm:text-sm text-gray-400 mt-2 block">سـاعـة</span>
+                </div>
+                <div class="glass-panel p-4 sm:p-6 rounded-2xl border-roseGold/20 transform hover:scale-105 transition duration-300">
+                    <span id="cMinutes" class="block font-bold text-3xl sm:text-5xl text-roseGold font-mono">00</span>
+                    <span class="text-xs sm:text-sm text-gray-400 mt-2 block">دقيقة</span>
+                </div>
+                <div class="glass-panel p-4 sm:p-6 rounded-2xl border-roseGold/20 transform hover:scale-105 transition duration-300">
+                    <span id="cSeconds" class="block font-bold text-3xl sm:text-5xl text-roseGold font-mono">00</span>
+                    <span class="text-xs sm:text-sm text-gray-400 mt-2 block">ثانية</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-roseGold/80 italic font-amiri text-base">"وما زلت أحبك كأنك أول الفرح وآخره..."</p>
+        </section>
+
+        <section class="space-y-12">
+            <div class="text-center space-y-3">
+                <h2 class="font-cairo text-3xl sm:text-5xl font-bold text-white glow-text-rose">
+                    رحلتنا سوياً 📍
+                </h2>
+                <p class="text-gray-400 text-sm sm:text-base">محطات لا تُنسى نقشتها الأيام في قلوبنا (اضغطي على المحطات)</p>
+            </div>
+
+            <div class="relative wrap overflow-hidden p-2 sm:p-6 h-full">
+                <div class="border-2-2 absolute border-rose-500/30 h-full border rounded-full left-1/2 -translate-x-1/2"></div>
+
+                <div class="mb-12 flex justify-between items-center w-full right-timeline group cursor-pointer" onclick="openMemoryModal(1)">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-rose-600 shadow-xl w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-night-900 justify-center group-hover:scale-125 transition duration-300">
+                        <i class="fas fa-star text-white text-sm sm:text-base"></i>
+                    </div>
+                    <div class="order-1 glass-panel rounded-2xl w-5/12 px-4 py-4 sm:px-6 sm:py-5 tilt-card">
+                        <span class="text-xs font-mono text-roseGold">المحطة الأولى</span>
+                        <h3 class="font-bold text-white text-base sm:text-xl mt-1">أول حديث بيننا 💬</h3>
+                        <p class="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">اليوم الذي بدأ فيه كل شيء جميلاً...</p>
+                    </div>
+                </div>
+
+                <div class="mb-12 flex justify-between flex-row-reverse items-center w-full left-timeline group cursor-pointer" onclick="openMemoryModal(2)">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-amber-500 shadow-xl w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-night-900 justify-center group-hover:scale-125 transition duration-300">
+                        <i class="fas fa-heart text-white text-sm sm:text-base"></i>
+                    </div>
+                    <div class="order-1 glass-panel rounded-2xl w-5/12 px-4 py-4 sm:px-6 sm:py-5 tilt-card text-right">
+                        <span class="text-xs font-mono text-amber-400">المحطة الثانية</span>
+                        <h3 class="font-bold text-white text-base sm:text-xl mt-1">اعتراف الحب 💕</h3>
+                        <p class="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">عندما نطقت القلوب بما كتمته العيون...</p>
+                    </div>
+                </div>
+
+                <div class="mb-12 flex justify-between items-center w-full right-timeline group cursor-pointer" onclick="openMemoryModal(3)">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-pink-500 shadow-xl w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-night-900 justify-center group-hover:scale-125 transition duration-300">
+                        <i class="fas fa-camera text-white text-sm sm:text-base"></i>
+                    </div>
+                    <div class="order-1 glass-panel rounded-2xl w-5/12 px-4 py-4 sm:px-6 sm:py-5 tilt-card">
+                        <span class="text-xs font-mono text-pink-400">المحطة الثالثة</span>
+                        <h3 class="font-bold text-white text-base sm:text-xl mt-1">أول لقاء وثيقة 📸</h3>
+                        <p class="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">ارتباك اليدين وجمال النظرات الأولى...</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between flex-row-reverse items-center w-full left-timeline group cursor-pointer" onclick="openMemoryModal(4)">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-purple-600 shadow-xl w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-night-900 justify-center group-hover:scale-125 transition duration-300">
+                        <i class="fas fa-infinity text-white text-sm sm:text-base"></i>
+                    </div>
+                    <div class="order-1 glass-panel rounded-2xl w-5/12 px-4 py-4 sm:px-6 sm:py-5 tilt-card text-right">
+                        <span class="text-xs font-mono text-purple-400">حاضرنا ومستقبلنا</span>
+                        <h3 class="font-bold text-white text-base sm:text-xl mt-1">معاً إلى الأبد 💍</h3>
+                        <p class="text-xs sm:text-sm text-gray-400 mt-1 hidden sm:block">وعد مستمر بـأن نكون سنداً لبعضنا البعض...</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="space-y-10">
+            <div class="text-center space-y-3">
+                <h2 class="font-cairo text-3xl sm:text-4xl font-bold text-white">
+                    نجومٌ تشبهكِ 🌟
+                </h2>
+                <p class="text-gray-400 text-sm sm:text-base">كل نجمة تحمل سبباً يمنحني الحياة من جديد</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div class="glass-panel p-6 rounded-3xl tilt-card space-y-4 relative overflow-hidden group">
+                    <div class="w-12 h-12 bg-rose-500/20 text-roseGold rounded-2xl flex items-center justify-center text-2xl group-hover:bg-rose-600 group-hover:text-white transition duration-300">
+                        <i class="fas fa-feather"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-white">رقة قلبكِ</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        تحملين حناناً يرمم كل انكسار، وتملكين روحاً تجعل كل من حولكِ يشعر بالدفء والاطمئنان.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl tilt-card space-y-4 relative overflow-hidden group">
+                    <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-amber-500 group-hover:text-white transition duration-300">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-white">ابتسامتكِ الساحرة</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        عندما تبتسمين، يتوقف التعب عن ملاحقتي، وتصبح الدنيا مكاناً يستحق العيش من أجله.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl tilt-card space-y-4 relative overflow-hidden group">
+                    <div class="w-12 h-12 bg-pink-500/20 text-pink-400 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-pink-500 group-hover:text-white transition duration-300">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-white">نظرة عينيكِ</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        في عينيكِ لغة لا تفهمها إلا روحي، وعالم كامل من الأمان والحب الصادق الذي لا ينتهي.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl tilt-card space-y-4 relative overflow-hidden group">
+                    <div class="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-purple-500 group-hover:text-white transition duration-300">
+                        <i class="fas fa-shield-heart"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-white">وجودكِ السند</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        أنتِ الشخص الوحيد الذي أجد عنده نفسي دون تصنع أو تجميل، ملجأي وملاذي في كل حين.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl tilt-card space-y-4 relative overflow-hidden group">
+                    <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-emerald-500 group-hover:text-white transition duration-300">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-white">تفاصيلكِ الصغيرة</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        طريقة كلامك، حركات يديك، اهتمامكِ بأصغر الأشياء.. تفاصيل تجعلني أقع في حبك كل يوم مجدداً.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl tilt-card space-y-4 relative overflow-hidden group">
+                    <div class="w-12 h-12 bg-rose-500/20 text-roseGold rounded-2xl flex items-center justify-center text-2xl group-hover:bg-rose-600 group-hover:text-white transition duration-300">
+                        <i class="fas fa-infinity"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-white">أنكِ أنتِ</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        لستُ بحاجة لأسباب كثيرة، بحبكِ كما أنتِ بكل مميزاتكِ وبساطتكِ وروعتكِ الفريدة.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="glass-panel-glow rounded-3xl p-8 sm:p-12 text-center space-y-8 flex flex-col items-center">
+            <div class="space-y-2">
+                <span class="text-xs text-roseGold font-mono tracking-widest uppercase">Secret Message</span>
+                <h2 class="font-cairo text-3xl sm:text-4xl font-bold text-white">
+                    رسالتي المغلقة بحب 💌
+                </h2>
+                <p class="text-gray-400 text-sm">اضغطي على المظروف لفتح الرسالة السرية الخاصة بكِ</p>
+            </div>
+
+            <div class="envelope-wrapper py-6">
+                <div class="envelope" id="loveEnvelope" onclick="toggleEnvelope()">
+                    <div class="envelope-top"></div>
+                    <div class="envelope-pocket"></div>
+                    <div class="envelope-letter flex flex-col items-center justify-center text-center">
+                        <i class="fas fa-heart text-velvet-600 text-2xl mb-1"></i>
+                        <span class="font-amiri text-xs text-velvet-700 font-bold">إلى أغلى إنسانة...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-gray-500 text-xs sm:text-sm space-y-2 pt-10 border-t border-roseGold/10">
+            <p class="font-amiri text-base text-gray-400">"دمتِ لي حباً لا ينتهي، وعيداً لكل أيامي."</p>
+            <p>صُنعت بكل كبرياء وحب لأجلكِ وحدكِ ❤️</p>
+        </footer>
+
+    </main>
+
+    <div id="letterModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-2xl glass-panel-glow rounded-3xl p-6 sm:p-10 text-right space-y-6 border border-roseGold/40 transform scale-90 transition-transform duration-300 max-h-[85vh] overflow-y-auto" id="letterModalContent">
+            
+            <button onclick="closeLetterModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white p-2 rounded-full hover:bg-rose-500/20 transition">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <div class="text-center space-y-2 border-b border-roseGold/20 pb-4">
+                <i class="fas fa-envelope-open-text text-4xl text-roseGold"></i>
+                <h3 class="font-amiri text-3xl font-bold text-white glow-text-rose">خطابي السرّي إليكِ</h3>
+            </div>
+
+            <div class="p-4 bg-night-900/60 rounded-2xl border border-roseGold/10">
+                <p id="typewriterText" class="font-amiri text-lg sm:text-xl text-gray-200 leading-relaxed whitespace-pre-line">
+                </p>
+            </div>
+
+            <div class="text-center pt-2">
+                <button onclick="closeLetterModal()" class="bg-gradient-to-r from-rose-500 to-velvet-600 text-white font-bold px-8 py-2.5 rounded-full shadow-lg hover:scale-105 transition">
+                    أحبكِ دائماً وأبداً ❤️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="memoryModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-md glass-panel rounded-3xl p-6 sm:p-8 text-center space-y-4 border border-roseGold/40 transform scale-90 transition-transform duration-300">
+            <button onclick="closeMemoryModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white p-2">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+
+            <div id="memoryIconContainer" class="w-16 h-16 bg-rose-600/20 text-roseGold rounded-2xl flex items-center justify-center text-3xl mx-auto">
+                <i class="fas fa-heart"></i>
+            </div>
+            
+            <h3 id="memoryTitle" class="font-cairo text-2xl font-bold text-white">عنوان الذكرى</h3>
+            <p id="memoryDate" class="text-xs font-mono text-roseGold">تاريخ الذكرى</p>
+            <p id="memoryDesc" class="text-gray-300 text-sm leading-relaxed">تفاصيل الذكرى الجصيلة...</p>
+        </div>
+    </div>
+
+    <script>
+        const startDate = new Date(2023, 1, 14, 12, 0, 0);
+
+        const loveLetterText = `إلى أميرتي الغالية،
+
+إذا كنتِ تقرئين هذه السطور الآن، فأنا أريدكِ أن تدركي شيئاً واحداً عميقاً: وجودكِ في حياتي لم يكن مجرد صدفة جميلة، بل كان أعظم تحول شهدته أيامي.
+
+معكِ تعلمتُ كيف يبتسم القلب قبل الشفاه، وكيف تسكن الروح في لحظة واحدة بجوار من تحب. أنتِ أماني في زحام الحياة، وضحكتي التي أهرب إليها كلما ثقلت علي الأيام.
+
+شكراً لأنكِ أنتِ.. برقتكِ، بطيبة قلبكِ النادرة، وبكل التفاصيل الصغيرة التي تجعل منكِ إنسانة لا شريك لها في قلبي.
+
+أوعدكِ أن أظل السند الذي لا يميل، والحب الذي يزيد مع كل إشراقة شمس جديدة.
+
+أحبكِ اليوم، وغداً، وحتى آخر نَفَس في العمر ❤️✨`;
+
+        const memoriesData = {
+            1: {
+                title: "أول حديث بيننا 💬",
+                date: "اليوم الأجمل في حياتي",
+                icon: "fa-star",
+                desc: "تلك الرسالة الأولى التي لم نكن نعلم أنها ستكون بداية لقصة حب استثنائية غيرت مجرى أيامي بالكامل."
+            },
+            2: {
+                title: "اعتراف الحب 💕",
+                date: "نبضات قلب متسارعة",
+                icon: "fa-heart",
+                desc: "عندما أعلنتُ لكِ سر قلبي، وشعرتُ بأن العالم كله يتوقف ليركب نغمة حبنا الجديدة."
+            },
+            3: {
+                title: "أول لقاء وثيقة 📸",
+                date: "عيون لا تتكلم ونظرات تدوم",
+                icon: "fa-camera",
+                desc: "ارتباك اليدين الأول، وجمال الضحكة الخجولة التي انطبعت في ذاكرتي ولن تمحى أبداً."
+            },
+            4: {
+                title: "حاضرنا ومستقبلنا 💍",
+                date: "إلى الأبد وعن يقين",
+                icon: "fa-infinity",
+                desc: "وعدي الصادق لكِ بأن نظل يداً بيد، نمر بالمصاعب معاً ونبني أحلامنا قطرة قطرة بكبرياء وعشق."
+            }
+        };
+
+        const canvas = document.getElementById('galaxyCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 120 };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initGalaxy();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 20) + 1;
+                this.color = Math.random() > 0.4 ? 'rgba(244, 114, 182, ' : 'rgba(225, 29, 72, ';
+                this.alpha = Math.random() * 0.7 + 0.3;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color + this.alpha + ')';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            update() {
+                if (mouse.x && mouse.y) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let force = (mouse.radius - distance) / mouse.radius;
+                        let directionX = dx / distance;
+                        let directionY = dy / distance;
+                        this.x -= directionX * force * this.density * 0.4;
+                        this.y -= directionY * force * this.density * 0.4;
+                    }
+                }
+
+                this.y -= 0.2;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        function initGalaxy() {
+            particles = [];
+            const count = Math.floor((canvas.width * canvas.height) / 9000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateGalaxy() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateGalaxy);
+        }
+
+        resizeCanvas();
+        animateGalaxy();
+
+        function updateLoveTimer() {
+            const now = new Date();
+            const diff = now - startDate;
+
+            const seconds = Math.floor((diff / 1000) % 60);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            document.getElementById('cDays').innerText = String(days).padStart(2, '0');
+            document.getElementById('cHours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('cMinutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('cSeconds').innerText = String(seconds).padStart(2, '0');
+        }
+        setInterval(updateLoveTimer, 1000);
+        updateLoveTimer();
+
+        let isEnvelopeOpen = false;
+        function toggleEnvelope() {
+            const envelope = document.getElementById('loveEnvelope');
+            if (!isEnvelopeOpen) {
+                envelope.classList.add('open');
+                isEnvelopeOpen = true;
+                setTimeout(() => {
+                    openLetterModal();
+                }, 900);
+            } else {
+                envelope.classList.remove('open');
+                isEnvelopeOpen = false;
+            }
+        }
+
+        let typewriterIdx = 0;
+        let typewriterTimer;
+
+        function typeWriterEffect() {
+            const el = document.getElementById('typewriterText');
+            if (typewriterIdx < loveLetterText.length) {
+                el.innerHTML += loveLetterText.charAt(typewriterIdx);
+                typewriterIdx++;
+                typewriterTimer = setTimeout(typeWriterEffect, 35);
+            }
+        }
+
+        function openLetterModal() {
+            const modal = document.getElementById('letterModal');
+            const content = document.getElementById('letterModalContent');
+            const textEl = document.getElementById('typewriterText');
+
+            textEl.innerHTML = '';
+            typewriterIdx = 0;
+            clearTimeout(typewriterTimer);
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-90');
+                content.classList.add('scale-100');
+            }, 10);
+
+            triggerHeartConfetti();
+            setTimeout(typeWriterEffect, 400);
+        }
+
+        function closeLetterModal() {
+            const modal = document.getElementById('letterModal');
+            const content = document.getElementById('letterModalContent');
+            const envelope = document.getElementById('loveEnvelope');
+
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-90');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                envelope.classList.remove('open');
+                isEnvelopeOpen = false;
+            }, 300);
+        }
+
+        function openMemoryModal(id) {
+            const data = memoriesData[id];
+            if (!data) return;
+
+            document.getElementById('memoryTitle').innerText = data.title;
+            document.getElementById('memoryDate').innerText = data.date;
+            document.getElementById('memoryDesc').innerText = data.desc;
+            document.getElementById('memoryIconContainer').innerHTML = `<i class="fas ${data.icon}"></i>`;
+
+            const modal = document.getElementById('memoryModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 10);
+        }
+
+        function closeMemoryModal() {
+            const modal = document.getElementById('memoryModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function triggerHeartConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 50,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#e11d48', '#f472b6', '#f59e0b', '#ffffff']
+                });
+            }
+        }
+    </script>
+</body>
+</html>
